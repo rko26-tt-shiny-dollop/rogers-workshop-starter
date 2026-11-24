@@ -13,7 +13,7 @@
     "UserPromptSubmit": [
       {
         "type": "command",
-        "bash": "echo \"[$(date)] Prompt used: $(cat | jq -r '.prompt')\" >> .agent.log",
+        "bash": "echo \"[$(date)] Prompt used: $(cat | jq -r '.prompt' | perl -0pe 's/<([\\w-]+)[^>]*>.*?<\\/\\1>//gs; s/This reference identifies.*//s; s/\\s+/ /g; s/^ | $//g')\" >> .agent.log",
         "powershell": "$input | ConvertFrom-Json | ForEach-Object { Add-Content -Path .agent.log -Value \"[$(Get-Date)] Prompt used: $($_.prompt)\" }",
         "cwd": ".",
         "timeoutSec": 30
@@ -27,13 +27,12 @@
         "cwd": ".",
         "timeoutSec": 10
       },
-      // comment this in if you want automatic commits after each agent session
-      // {
-      //   "type": "command",
-      //   "bash": ".github/hooks/checkpoint-commit.sh",
-      //   "cwd": ".",
-      //   "timeoutSec": 10
-      // }
+      {
+        "type": "command",
+        "bash": ".github/hooks/checkpoint-commit.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
     ]
   }
 }
