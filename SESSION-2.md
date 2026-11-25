@@ -7,8 +7,7 @@ used where it's strongest.
 
 **Through-line:** In Session 1 you used Copilot as it comes. In this session you teach
 it how your team works: package conventions as a **skill**, give work to specialized
-**custom agents**, enforce policy with **hooks**, bundle all three as a **plugin**, and
-hand recurring work to **agentic workflows**.
+**custom agents**, enforce policy with **hooks**, and bundle all three as a **plugin**.
 
 Today we'll cover skills, custom agents, hooks, and plugins. Agentic workflows are
 covered in Session 1's S7.
@@ -135,6 +134,18 @@ Observe the output. Were the custom scoped instructions followed?
 Adding an API entity touches a model, repository, routes, migration, seed data, Swagger
 docs, and tests. Copilot doesn't do all of it to your standards every time.
 
+### Background
+
+A skill is a folder containing a `SKILL.md` file. Its frontmatter has a `name` and a
+`description`, the body holds the steps, and any extra files (`references/`, scripts)
+sit alongside it. Project skills live in `.github/skills/`; personal skills live in
+`~/.copilot/skills/` and work in every project.
+
+Copilot keeps only each skill's name and description in context. When a task matches a
+description, it loads the full skill. That's the difference from custom instructions:
+instructions are rules that always apply, while a skill is a procedure loaded only when
+it's needed.
+
 ### 🧑‍💻 Hands-on
 
 > 1. Open `.github/skills/api-endpoint/SKILL.md` and its `references/` folder.
@@ -172,6 +183,17 @@ docs, and tests. Copilot doesn't do all of it to your standards every time.
 
 Some work needs a specialist: a role with its own rules, tools, and boundaries.
 
+### Background
+
+A custom agent is a Markdown file in `.github/agents/<name>.agent.md`. Its frontmatter
+sets a `name`, a `description`, and optionally `tools` (which tools it may use; all of
+them if unset) and `model`. The body is the agent's instructions: its role, rules, and
+boundaries.
+
+You can select an agent yourself, or another agent can delegate work to it. A skill
+tells Copilot *how* to do a task; an agent changes *who* is doing it, with its own
+rules and tools.
+
 ### 🧑‍💻 Hands-on
 
 > 1. Open `.github/agents/bdd-specialist.agent.md`. Notice its description, tools, and
@@ -185,6 +207,8 @@ Some work needs a specialist: a role with its own rules, tools, and boundaries.
 ### 🎬 Demo only: a team of agents across the SDLC
 
 Demonstration of an agentic delegation workflow between multiple agents.
+**tech-lead** doesn't write code. It hands each stage to a specialist (QA, PM, coding,
+code review, delivery), and each specialist has only the tools for its job.
 
 [![Custom agent swarm: tech-lead delegates to QA, PM, coding, code-review, and delivery agents](docs/images/sdlc-agent-swarm.jpg)](docs/images/sdlc-agent-swarm.jpg)
 
@@ -247,6 +271,19 @@ Setup:
 
 Your team wants an auditable record of what Copilot changed.
 
+### Background
+
+A hook is a command that Copilot runs automatically at a specific point in a session.
+Hooks are configured in `.github/hooks/hooks.json`. Each event (for example
+`sessionStart`, `userPromptSubmitted`, `preToolUse`, `postToolUse`, `agentStop`) lists
+commands with `bash` and `powershell` versions, a working directory (`cwd`), and a
+timeout. Each command receives details about the event as JSON on stdin, such as the
+prompt text.
+
+Most hooks only observe, for example by writing a log. A `preToolUse` hook can also
+**allow or deny** a tool call before it runs, which is how teams enforce policy. Today
+you'll build an audit trail.
+
 ### 🧑‍💻 Hands-on
 
 > 1. Start a **New session** and prompt:
@@ -283,6 +320,9 @@ Your team wants an auditable record of what Copilot changed.
 ### What to notice
 
 - The hook ran without anyone asking; it's a command, not a prompt.
+- `.agent.log` gets a line at session start, for each prompt, and when Copilot stops.
+- With the checkpoint script turned on, `git log -1 --stat` shows a commit of the
+  README change, with the Copilot `Co-authored-by` trailer.
 
 ---
 
@@ -418,11 +458,11 @@ plugins for everyone.
 
 | You did | With |
 |---|---|
+| Set team standards | Custom instructions |
 | Encoded a workflow | A skill |
 | Delegated to a specialist | A custom agent |
 | Enforced an audit trail | A hook |
 | Shared all three | A plugin |
-| Automated failure analysis | An agentic workflow |
 
 ### Resources
 
