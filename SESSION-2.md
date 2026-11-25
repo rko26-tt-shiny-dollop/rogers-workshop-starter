@@ -186,8 +186,10 @@ Some work needs a specialist: a role with its own rules, tools, and boundaries.
 ### Background
 
 A custom agent is a Markdown file in `.github/agents/<name>.agent.md`. Its frontmatter
-sets a `name`, a `description`, and optionally `tools` (which tools it may use; all of
-them if unset) and `model`. The body is the agent's instructions: its role, rules, and
+supports a range of properties, including a `name` to select it by, a `description` of
+what it's for, `tools` (which tools it may use; all of them if unset), and `model`. See
+the [custom agents configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
+for the full list. The body is the agent's instructions: its role, rules, and
 boundaries.
 
 You can select an agent yourself, or another agent can delegate work to it. A skill
